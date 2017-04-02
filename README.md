@@ -10,7 +10,7 @@ There are two methods for getting started with this repo.
 Checkout this repo, install dependencies, then start the gulp process with the following:
 
 ```
-	> git clone 
+	> git clone https://github.com/parzie/marvel-redux.git
 	> cd marvel-redux
 	> npm install
 	> npm start

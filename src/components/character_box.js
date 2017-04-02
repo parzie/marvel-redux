@@ -4,15 +4,23 @@ import CharacterBoxItem from './character_box_item';
 
 const CharacterBox = (props) => {
   const characterItems = props.characters.map((character) => {
+    //console.log("id: "+character.id);
+    
     return <CharacterBoxItem
+      character={character}
       key={character.id}
-      character={character} />
+      onClickCharacter={props.onClickCharacter} 
+      comics={props.comics}
+      selectedCharacter = {props.selectedCharacter}
+      openModal = {props.openModal}
+      />
   });
   return (
-    <ul className="col-md-4 list-group">
+    <ul className="">
       {characterItems}
     </ul>
   );
 };
+
 
 export default CharacterBox;

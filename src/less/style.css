@@ -1,3 +1,18 @@
+.big-box{
+  border: 1px solid pink;
+  display: inline-block;
+  vertical-align: top;
+  width: 70%;
+
+}
+
+.comic-box{
+  border: 1px solid purple;
+    display: inline-block;
+  vertical-align: top;
+  width: 29%;
+}
+
 .search-bar {
   margin: 20px;
   text-align: center;
@@ -7,11 +22,14 @@
   width: 75%;
 }
 
-.video-item img {
+.comic-item img {
   max-width: 64px;
 }
-
-.video-detail .details {
+.character-detail{
+  width: 700px;
+  /*border: 1px solid red;*/
+}
+.character-detail .details {
   width: 600px;
   height: 300px;
   margin-top: 10px;
