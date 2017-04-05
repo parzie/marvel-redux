@@ -6,6 +6,7 @@ const CharacterBoxItem = ({character, onClickCharacter, comics, selectedCharacte
   }
   //console.log("character: "+character.name);
   const characterId = character.id;
+  
   const comicItems = comics.map((comic) => {
   if(character==selectedCharacter){  
     return <ComicBoxItem
@@ -19,17 +20,18 @@ const CharacterBoxItem = ({character, onClickCharacter, comics, selectedCharacte
 
   return (
     <div className="character-detail" >
-        <div>{characterId}</div>
-      
+        <img src={character.thumbnail.path+"."+character.thumbnail.extension} alt={character.name} />
+        <h3>{character.name}</h3>
+        <div className="description"><p>{character.description}</p><button>view more</button></div>
       <div className="details">
-        <div>{character.name}</div>
-        <div>{character.description}</div>
-        <a href="#" onClick={() => {
-          onClickCharacter(character);
-      }}>Related Comics</a>
-        <ul className="">
+        
+        
+        <a  href="#" onClick={() => {
+          onClickCharacter(character, 4);
+      }}><h4>Related Comics</h4></a>
+        <div className="related-comics">
           {comicItems}
-        </ul>
+        </div>
       </div>
       
     </div>

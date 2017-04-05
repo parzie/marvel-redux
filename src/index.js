@@ -7,22 +7,39 @@ import ComicBox from './components/comic_box';
 import Modal from 'react-modal';
 import Pager from 'react-pager';
 import CryptoJS from 'crypto-js';
+import styles from './less/style.less';
+
 
 var $ = require('jquery');
-const PUBLIC_KEY = '0bdc034cdac9e6bba2b885bbc39ce440';
-const PRIVATE_KEY = '7bef8636014521f17dd93e22e22ee9ff78572963';
+const PUBLIC_KEY = '241328638ad6321eb015fa420ebb26ec';
+const PRIVATE_KEY = 'ef49e3bbefc86b92aad3aa192719a4f50d9a4f92';
+const LIMIT = 10;
 var hash;
 var ts;
 
 
 const customStyles = {
+  overlay : {
+    position          : 'fixed',
+    top               : 0,
+    left              : 0,
+    right             : 0,
+    bottom            : 0,
+    backgroundColor   : 'rgba(0, 0, 0, 0.75)'
+  },
   content : {
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)'
+    position                   : 'absolute',
+    top                        : '50px',
+    left                       : '250px',
+    right                      : '250px',
+    bottom                     : '50px',
+    border                     : 'none',
+    background                 : '#fff',
+    overflow                   : 'auto',
+    WebkitOverflowScrolling    : 'touch',
+    borderRadius               : '1px',
+    outline                    : 'none',
+
   }
 };
 
@@ -39,7 +56,7 @@ class App extends React.Component {
     hash = CryptoJS.MD5(ts + PRIVATE_KEY + PUBLIC_KEY).toString(),
 
     this.state = {
-      total:       11,
+      total:       149,
       visiblePage: 5,
       current:     0,
 
@@ -51,13 +68,17 @@ class App extends React.Component {
       favoriteComics: [],
       isFavoriteComicList: false,
       term : null,
+      sort: 'name',
 
       
     };
+    this.sortBy = this.sortBy.bind(this);
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.characterSearch('');
+    this.getFavorites();
+    this.characterSearch("");
+    //this.characterSearch = this.characterSearch.bind(this);
   }
 
   handlePageChanged(newPage) {
@@ -93,14 +114,12 @@ class App extends React.Component {
       this.favoriteComics.push(comic);
       localStorage.setItem('favoriteComics', JSON.stringify(this.favoriteComics));  
     }
-    console.log("fav comics: "+ this.favoriteComics);
     
   }
 
   getFavorites(){
     
     this.favoriteComics  = JSON.parse(localStorage.getItem("favoriteComics"));
-    console.log("fav comics: "+ this.favoriteComics);
 
   }
 
@@ -109,6 +128,7 @@ class App extends React.Component {
       console.log("removing...");
       this.favoriteComics = this.favoriteComics.filter((c) => c.id !== comic.id);
       localStorage.setItem('favoriteComics', JSON.stringify(this.favoriteComics));  
+      this.characterSearch("");
     }
 
   }
@@ -122,19 +142,19 @@ class App extends React.Component {
 
   characterSearch(term) {
     this.term = term;
-    this.getFavorites();
+    
     var url = '';
     var offset;
-    console.log("offset"+this.state.current );
+    var sort = this.state.sort;
     if(this.state.current > 0){
-      offset = this.state.current + 10;
+      offset = this.state.current * 10;
     }else{
       offset = this.state.current;
     }
     if(term){
-      url = 'http://gateway.marvel.com/v1/public/characters?nameStartsWith='+term+'&offset='+offset+'&limit=10&apikey='+PUBLIC_KEY+'&hash='+hash+'&ts='+ts+'';
+      url = 'http://gateway.marvel.com/v1/public/characters?orderBy='+sort+'&nameStartsWith='+term+'&offset='+offset+'&limit='+LIMIT+'&apikey='+PUBLIC_KEY+'&hash='+hash+'&ts='+ts+'';
     }else{
-      url = 'http://gateway.marvel.com/v1/public/characters?offset='+offset+'&limit=10&apikey='+PUBLIC_KEY+'&hash='+hash+'&ts='+ts+'';
+      url = 'http://gateway.marvel.com/v1/public/characters?orderBy='+sort+'&offset='+offset+'&limit='+LIMIT+'&apikey='+PUBLIC_KEY+'&hash='+hash+'&ts='+ts+'';
     }
     return $.getJSON(url)
       .then((data, characters) => {
@@ -147,6 +167,15 @@ class App extends React.Component {
 
   }
 
+  sortBy(event){
+    this.state.sort = event.target.value;
+    if(this.term){
+          this.characterSearch(this.term);
+        }else{
+          this.characterSearch("");
+      }
+  }
+
   render() {
     const Search = _.debounce((term) => { this.characterSearch(term) }, 300);
     return (
@@ -154,36 +183,24 @@ class App extends React.Component {
         
         <SearchBar onSearchTermChange={this.characterSearch.bind(this)}/>
         <div className="big-box">
+          <h2><img src="/src/images/icons/characters.png" />Characters</h2>
+          <select className="form-control sort-by" value={this.state.sort} onChange={this.sortBy}>
+            <option value="name">name</option>
+            <option value="modified">modified</option>
+            <option value="-name">name desc</option>
+            <option value="-modified">modified desc</option>
+          </select>
           <CharacterBox 
           characters={this.state.characters} 
           onClickCharacter={this.onClickCharacter.bind(this)}
           comics={this.state.comics}
           selectedCharacter={this.state.selectedCharacter}
           openModal={this.openModal.bind(this)}
+          getComics={this.getComics.bind(this)}
           
           />
-        </div>
-        <div className="comic-box">
-          <ComicBox comics={this.favoriteComics} isFavoriteComicList={true} removeFromFavorites={this.removeFromFavorites.bind(this)}/>
-        </div>
-
-        <Modal
-          isOpen={this.state.modalIsOpen}
-          onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeModal}
-          style={customStyles}
-          contentLabel="Example Modal"
-        >
-        <h2 ref="subtitle">Hello</h2>
-          <button onClick={this.closeModal}>close</button>
-          <div>{this.selectedComic && this.selectedComic.title}</div>
-          {this.isAddedToFavorites(this.selectedComic) ? <button >Added to Favorites</button>:<button onClick={() => {this.addToFavorites(this.selectedComic)}}>Add to Favorites</button>}
-          
-          <form>   
-            <button>Buy For $3.99</button>
-          </form>
-        </Modal>
-        <Pager
+          <div className="pager">
+          <Pager
                 total={this.state.total}
                 current={this.state.current}
                 visiblePages={this.state.visiblePage}
@@ -191,25 +208,75 @@ class App extends React.Component {
                   first: 'first', 
                   last: 'last' 
                 }}
-                className="pagination-sm pull-right"
                 onPageChanged={this.handlePageChanged}
             />
+            </div>
+        </div>
+        <div className="comic-box">
+          <ComicBox comics={this.favoriteComics} isFavoriteComicList={true} removeFromFavorites={this.removeFromFavorites.bind(this)}/>
+        </div>
+
+        <Modal
+          isOpen={this.state.modalIsOpen}
+          /*onAfterOpen={this.afterOpenModal}*/
+          onRequestClose={this.closeModal}
+          style={customStyles}
+          contentLabel="Example Modal"
+        >
+          
+          {this.selectedComic && 
+          <div className="modal-comic">
+            <a  href="#" onClick={this.closeModal}></a>  
+            <img className="comic-image" src={this.selectedComic.thumbnail.path+"."+this.selectedComic.thumbnail.extension} />
+            <h2>{this.selectedComic.title}</h2>
+            <p>{this.selectedComic.description}</p>
+          </div>
+          }
+          
+            {          
+              this.isAddedToFavorites(this.selectedComic) ? 
+              <div className="modal-button added">
+              <div className="center">
+                <p><img src="/src/images/icons/btn-favourites-primary.png"/>Added to Favourites</p>
+              </div>
+              </div>:
+              <div className="modal-button left">
+            <div className="center">
+              <a href="#" onClick={() => {this.addToFavorites(this.selectedComic)}}>
+                <img src="/src/images/icons/btn-favourites-default.png"/>Add to Favourites</a>
+            </div>
+            </div>}         
+          <div className="modal-button">
+            <div className="center"><a href="#"><img src="/src/images/icons/shopping-cart-primary.png"/>Buy For $3.99</a></div>
+          </div>
+          
+          
+        </Modal>
+        
       </div>
     );
   }
-  onClickCharacter(character) {
-    var url = 'http://gateway.marvel.com/v1/public/characters/'+character.id+'/comics?limit=4&apikey=0bdc034cdac9e6bba2b885bbc39ce440&hash=2ed41249ca3bf735686e581fb9b20718&ts=1490815685786';
+
+  getComics(character, limit){
+    this.onClickCharacter(character, limit);
+    return this.state.comics;
+  }
+
+  onClickCharacter(character, limit) {
+    var url = 'http://gateway.marvel.com/v1/public/characters/'+character.id+'/comics?limit='+limit+'&apikey='+PUBLIC_KEY+'&hash='+hash+'&ts='+ts+'';
     return $.getJSON(url)
       .then((data, comics) => {
+        //console.log("first character: "+data.data.results[0].title);
+        //this.state.selectedComic = data.data.results[0];
+        //console.log("selectedComic: "+this.state.selectedComic.title);
         this.setState({ 
           comics: data.data.results,
           selectedCharacter: character
          });
       });
-    //this.setState({ selectedCharacter: character });
   }
 
 }
 
 // Take this component's generated HTML and put it on the page (in the DOM)
-ReactDOM.render(<App />, document.querySelector('.container'));
+ReactDOM.render(<App />, document.querySelector('#container'));

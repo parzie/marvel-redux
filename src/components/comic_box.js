@@ -12,9 +12,12 @@ const ComicBox = (props) => {
       />
   });
   return (
-    <ul className="">
+    <div>
+    <h2><img src="/src/images/icons/favourites.png" />My favourites</h2>
+    <div >
       {comicItems}
-    </ul>
+    </div>
+    </div>
   );
 };
 

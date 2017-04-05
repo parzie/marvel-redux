@@ -10,9 +10,12 @@ class SearchBar extends Component {
   render() {
     return (
       <div className="search-bar">
-        <input
-        value={this.state.term}
-        onChange={event => this.onInputChange(event.target.value)} />
+        <img className="marvel-logo" src="/src/images/marvel-logo.png"/>
+        <div className="center-stuff">
+          <input type="text" className="form-control"  placeholder="Search character..."
+          value={this.state.term}
+          onChange={event => this.onInputChange(event.target.value)} />
+        </div>
       </div>
     );
   }
