@@ -28,7 +28,9 @@
     "file-loader": "^0.8.5",
     "react-addons-test-utils": "^0.14.8",
     "webpack": "^1.12.9",
-    "webpack-dev-server": "^1.14.0"
+    "webpack-dev-server": "^1.14.0",
+	"react-pager":"^1.2.1",
+	"crypto-js":"^3.1.9-1"
   },
   "dependencies": {
     "babel-preset-stage-1": "^6.1.18",
