@@ -29,11 +29,12 @@
     "react-addons-test-utils": "^0.14.8",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0",
-	"react-pager":"^1.2.1",
-	"crypto-js":"^3.1.9-1"
+    "react-pager": "^1.2.1",
+    "crypto-js": "^3.1.9-1"
   },
   "dependencies": {
     "babel-preset-stage-1": "^6.1.18",
+    "foobar": "^1.1.0",
     "lodash": "^3.10.1",
     "react": "15.4.2",
     "react-dom": "^15.4.2",

@@ -106,28 +106,30 @@ class App extends React.Component {
 
   addToFavorites(comic){
     if(!this.favoriteComics){
-      this.favoriteComics = [];
+      this.setState("favoriteComics", []);
     }else{
-      this.favoriteComics = JSON.parse(localStorage.getItem('favoriteComics'));
+      this.setState("favoriteComics", JSON.parse(localStorage.getItem('favoriteComics')));
     }
-    if(comic){        
-      this.favoriteComics.push(comic);
-      localStorage.setItem('favoriteComics', JSON.stringify(this.favoriteComics));  
+    if(comic){
+      this.state.favoriteComics.push(comic);
+      localStorage.setItem('favoriteComics', JSON.stringify(this.state.favoriteComics));  
     }
     
   }
 
   getFavorites(){
-    
-    this.favoriteComics  = JSON.parse(localStorage.getItem("favoriteComics"));
+    var favoriteComics = JSON.parse(localStorage.getItem("favoriteComics"));
 
+    if (favoriteComics) {
+      this.setState("favoriteComics", favoriteComics);
+    }
   }
 
   removeFromFavorites(comic){
     if(comic){
       console.log("removing...");
-      this.favoriteComics = this.favoriteComics.filter((c) => c.id !== comic.id);
-      localStorage.setItem('favoriteComics', JSON.stringify(this.favoriteComics));  
+      this.setState("favoriteComics", this.state.favoriteComics.filter((c) => c.id !== comic.id));
+      localStorage.setItem('favoriteComics', JSON.stringify(this.state.favoriteComics));  
       this.characterSearch("");
     }
 
@@ -135,7 +137,7 @@ class App extends React.Component {
 
   isAddedToFavorites(comic){
     if(comic){
-      return !!this.favoriteComics.find((c) => c.id === comic.id);
+      return !!this.state.favoriteComics.find((c) => c.id === comic.id);
     }
   }
 
@@ -213,7 +215,7 @@ class App extends React.Component {
             </div>
         </div>
         <div className="comic-box">
-          <ComicBox comics={this.favoriteComics} isFavoriteComicList={true} removeFromFavorites={this.removeFromFavorites.bind(this)}/>
+          <ComicBox comics={this.state.favoriteComics} isFavoriteComicList={true} removeFromFavorites={this.removeFromFavorites.bind(this)}/>
         </div>
 
         <Modal
